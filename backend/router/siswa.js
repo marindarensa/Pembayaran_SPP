@@ -5,6 +5,24 @@ const app = express()
 //call model
 const siswa = require("../models/index").siswa
 
+//library untuk upload file
+const multer = require("multer")//multer digunakan untuk membaca data request dari form-data
+const path = require("path")//path untuk menage alamat direktori file
+const fs = require("fs")// fs atau fole stream digunakan untuk manage file
+
+//---------------------------------------------------------------------------------------------
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "./image")
+    },
+    filename: (req, file, cb) => {
+        cb(null, "image-" + Date.now() + path.extname(file.originalname))
+    }
+}) 
+
+const upload = multer({storage:storage})
+//---------------------------------------------------------------------------------------------
+
 
 //midleware for allow the request
 app.use(express.urlencoded({extended:true}))
@@ -27,16 +45,16 @@ app.get("/", async(req, res) => {
     })
 })
 
-app.post("/", async(req, res) => {
+app.post("/", upload.single("image") , async(req, res) => {
     //tampung data request
     let data = {
-        nisn: req.body.nisn,
         nis: req.body.nis,
         nama: req.body.nama,
         id_kelas: req.body.id_kelas,
         alamat: req.body.alamat,
         no_telp: req.body.no_telp,
-        id_spp: req.body.id_spp
+        id_spp: req.body.id_spp,
+        image: req.file.filename
     }
 
     siswa.create(data)
@@ -53,10 +71,9 @@ app.post("/", async(req, res) => {
     })
 })
 
-app.put("/", async(req, res) => {
+app.put("/", upload.single("image") ,async(req, res) => {
     //tampung data request
     let data = {
-        nisn: req.body.nisn,
         nis: req.body.nis,
         nama: req.body.nama,
         id_kelas: req.body.id_kelas,
@@ -66,9 +83,22 @@ app.put("/", async(req, res) => {
     }
         
     let param = {
-        id_siswa: req.body.id_siswa
+        nisn: req.body.nisn
+    }
+//---------------------------------------------------------------------------------------------
+    //cek data image                                                                           
+    if (req.file) {
+        let oldsiswa = await siswa.findOne({where: param})
+        let oldImage = oldsiswa.image
+
+        //delete file lama
+        let pathfile = path.join(__dirname,"../image",oldImage)
+        fs.unlink(pathfile, error => console.log(error))
+
+        data.image = req.file.filename
     }
 
+//---------------------------------------------------------------------------------------------
     siswa.update(data,{where : param})
     .then(result => {
         res.json({
@@ -83,11 +113,24 @@ app.put("/", async(req, res) => {
     })
 })
 
-app.delete("/:id_siswa", async(req, res) => {
-    let id_siswa = req.params.id_siswa
+app.delete("/:nisn", async(req, res) => {
+    let nisn = req.params.nisn
     let perameter = {
-        id_siswa: id_siswa
+        nisn: nisn
     }
+
+//---------------------------------------------------------------------------------------------
+
+    let oldsiswa = await siswa.findOne({where: perameter})
+    let oldImage = oldsiswa.image
+
+    //delete file lama
+    let pathfile = path.join(__dirname,"../image",oldImage)
+    fs.unlink(pathfile, error => console.log(error))
+
+    data.image = req.file.filename
+
+//---------------------------------------------------------------------------------------------
 
     siswa.destroy({where : perameter})
     .then(result => {

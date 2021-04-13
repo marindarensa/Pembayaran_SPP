@@ -25,7 +25,7 @@ verifyToken = (req, res, next) => {
         jwt.verify(token, secretKey, jwtHeader, err => {
             if(err){
                 res.json({
-                    message: "Invalid"
+                    message: "Invalid token"
                 })
             }else{
                 next()

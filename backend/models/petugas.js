@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     username: DataTypes.STRING,
     password: DataTypes.STRING,
     nama_petugas: DataTypes.STRING,
+    image: DataTypes.STRING,
     level: DataTypes.ENUM({
       values: ['admin', 'petugas']
     })

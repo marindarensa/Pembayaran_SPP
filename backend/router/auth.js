@@ -1,12 +1,12 @@
 const express = require("express")
 const app = express()
-const jwt = require("jsonwebtoken") // npm install jsonwebtoken
+const jwt = require("jsonwebtoken")
 const md5 = require("md5")
 
 // model petugas
 const petugas = require("../models/index").petugas
 app.use(express.urlencoded({extended: true}))
-
+app.use(express.json())
 app.post("/login", async (req, res) => {
     let parameter = {
         username: req.body.username,
@@ -15,14 +15,11 @@ app.post("/login", async (req, res) => {
 
     let result = await petugas.findOne({where: parameter})
     if(result === null){
-        // invalid username or password
         res.json({
+            logged: false,
             message: "Invalid Username or Password"
         })
     }else{
-        // login success
-        // generate token using jwt
-        // jwt->header, payload, secretKey
         let jwtHeader = {
             algorithm: "HS256",
             expiresIn: "24h"
@@ -33,6 +30,7 @@ app.post("/login", async (req, res) => {
 
         let token = jwt.sign(payload, secretKey, jwtHeader)
         res.json({
+            logged: true,
             data: result,
             token: token
         })

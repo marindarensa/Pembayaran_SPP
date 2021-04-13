@@ -19,7 +19,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         references: {
           model: "siswa",
-          key: "id_siswa"
+          key: "nisn"
         }
       },
       tgl_bayar: {

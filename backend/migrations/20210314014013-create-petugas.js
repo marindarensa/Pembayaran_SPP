@@ -17,6 +17,9 @@ module.exports = {
       nama_petugas: {
         type: Sequelize.STRING
       },
+      image: {
+        type: Sequelize.STRING
+      },
       level: {
         type: Sequelize.DataTypes.ENUM('admin','petugas')
       },

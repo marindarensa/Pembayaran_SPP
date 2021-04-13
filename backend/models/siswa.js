@@ -20,20 +20,20 @@ module.exports = (sequelize, DataTypes) => {
         as: "kelas"
       })
       this.hasMany(models.pembayaran, {
-        foreignKey: "id_siswa",
+        foreignKey: "nisn",
         as: "pembayaran"
       })
     }
   };
   siswa.init({
-    id_siswa: {
+    nisn: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true
     },
-    nisn: DataTypes.CHAR,
     nis: DataTypes.CHAR,
     nama: DataTypes.STRING,
+    image: DataTypes.STRING,
     id_kelas: DataTypes.INTEGER,
     alamat: DataTypes.TEXT,
     no_telp: DataTypes.STRING,
